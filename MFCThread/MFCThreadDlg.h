@@ -3,6 +3,7 @@
 //
 
 #pragma once
+#define WM_MY_CUSTOM_MESSAGE (WM_APP + 1)
 UINT LeftToRight_Thread(LPVOID pParam);
 
 // CMFCThreadDlg dialog
@@ -34,7 +35,8 @@ protected:
 
 public:
 	afx_msg void stopMyThread();
-	
+	afx_msg LRESULT OnMyCustomMessage(WPARAM wParam, LPARAM lParam);
+
 	int number;
 	CStatic myTxt;
 

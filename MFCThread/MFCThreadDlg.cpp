@@ -11,6 +11,8 @@
 #define new DEBUG_NEW
 #endif
 
+CWnd* pWnd;
+
 class CAboutDlg : public CDialogEx
 {
 public:
@@ -45,6 +47,7 @@ CMFCThreadDlg::CMFCThreadDlg(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_MFCTHREAD_DIALOG, pParent)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+	pWnd = pParent;
 }
 
 void CMFCThreadDlg::DoDataExchange(CDataExchange* pDX)
@@ -59,14 +62,28 @@ BEGIN_MESSAGE_MAP(CMFCThreadDlg, CDialogEx)
 	ON_WM_QUERYDRAGICON()
 	ON_WM_TIMER()
 	ON_BN_CLICKED(IDC_BUTTON_START, &CMFCThreadDlg::OnBnClickedButtonStart)
+	ON_MESSAGE(WM_MY_CUSTOM_MESSAGE, &CMFCThreadDlg::OnMyCustomMessage)
 END_MESSAGE_MAP()
 
-
-// CMFCThreadDlg message handlers
-//void CMFCThreadDlg::abcd()
+//LRESULT CMFCThreadDlg::OnUpdateProgress(WPARAM wParam, LPARAM lParam)
 //{
-//	TRACE("\n bbbbbbbbbbbbbbbbbbbbb: \n");
+//	int progress = (int)lParam;
+//	//m_progressCtrl.SetPos(progress);
+//	TRACE("\n aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa: %d \n", progress);
+//
+//	return 0;
 //}
+
+LRESULT CMFCThreadDlg::OnMyCustomMessage(WPARAM wParam, LPARAM lParam)
+{
+	int nParam1 = (int)wParam;
+	CString strData = (LPCTSTR)lParam;  // Cast LPARAM to the data type you expect
+	TRACE("\n OnMyCustomMessage: %d \n", nParam1);
+	CString abc;
+	abc.Format(_T("%d"), number);
+	myTxt.SetWindowText(abc);
+	return 0;
+}
 
 BOOL CMFCThreadDlg::OnInitDialog()
 {
@@ -93,10 +110,10 @@ BOOL CMFCThreadDlg::OnInitDialog()
 	SetIcon(m_hIcon, TRUE);			// Set big icon
 	SetIcon(m_hIcon, FALSE);		// Set small icon
 
-	SetTimer(200, 500, NULL);
+	//SetTimer(200, 500, NULL);
 	thread = AfxBeginThread(LeftToRight_Thread, this);
 	//myTxt.SetWindowText(_T("ssss0%"));
-	AfxMessageBox(_T("testttt"), MB_ICONWARNING);
+	//AfxMessageBox(_T("testttt"), MB_ICONWARNING);
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
 
@@ -152,9 +169,16 @@ UINT LeftToRight_Thread(LPVOID pParam)
 	CMFCThreadDlg* ptr = (CMFCThreadDlg*)pParam;
 	while (ptr->number < 100)
 	{
-		Sleep(100);
-		TRACE("\n aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa: %d \n", ptr->number);
+		Sleep(1000);
+		//TRACE("\n aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa: %d \n", ptr->number);
 		ptr->number++;
+		if (ptr->number == 10) {
+			ptr->stopMyThread();
+		}
+		HWND hWnd = AfxGetMainWnd()->GetSafeHwnd();
+		int nParam1 = ptr->number;
+		LPARAM lParam = (LPARAM)"Hello, world!";  // Any data that can be cast to LPARAM
+		PostMessage(hWnd, WM_MY_CUSTOM_MESSAGE, nParam1, lParam);
 	}
 	return 0;
 }
