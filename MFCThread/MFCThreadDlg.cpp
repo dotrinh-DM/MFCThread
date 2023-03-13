@@ -65,26 +65,6 @@ BEGIN_MESSAGE_MAP(CMFCThreadDlg, CDialogEx)
 	ON_MESSAGE(WM_MY_CUSTOM_MESSAGE, &CMFCThreadDlg::OnMyCustomMessage)
 END_MESSAGE_MAP()
 
-//LRESULT CMFCThreadDlg::OnUpdateProgress(WPARAM wParam, LPARAM lParam)
-//{
-//	int progress = (int)lParam;
-//	//m_progressCtrl.SetPos(progress);
-//	TRACE("\n aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa: %d \n", progress);
-//
-//	return 0;
-//}
-
-LRESULT CMFCThreadDlg::OnMyCustomMessage(WPARAM wParam, LPARAM lParam)
-{
-	int nParam1 = (int)wParam;
-	CString strData = (LPCTSTR)lParam;  // Cast LPARAM to the data type you expect
-	TRACE("\n OnMyCustomMessage: %d \n", nParam1);
-	CString abc;
-	abc.Format(_T("%d"), number);
-	myTxt.SetWindowText(abc);
-	return 0;
-}
-
 BOOL CMFCThreadDlg::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
@@ -169,17 +149,27 @@ UINT LeftToRight_Thread(LPVOID pParam)
 	CMFCThreadDlg* ptr = (CMFCThreadDlg*)pParam;
 	while (ptr->number < 100)
 	{
-		Sleep(1000);
+		Sleep(500);
 		//TRACE("\n aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa: %d \n", ptr->number);
 		ptr->number++;
-		if (ptr->number == 10) {
+	/*	if (ptr->number == 10) {
 			ptr->stopMyThread();
-		}
-		HWND hWnd = AfxGetMainWnd()->GetSafeHwnd();
+		}*/
 		int nParam1 = ptr->number;
 		LPARAM lParam = (LPARAM)"Hello, world!";  // Any data that can be cast to LPARAM
-		PostMessage(hWnd, WM_MY_CUSTOM_MESSAGE, nParam1, lParam);
+		PostMessage(AfxGetMainWnd()->GetSafeHwnd(), WM_MY_CUSTOM_MESSAGE, nParam1, lParam);
 	}
+	return 0;
+}
+
+LRESULT CMFCThreadDlg::OnMyCustomMessage(WPARAM wParam, LPARAM lParam)
+{
+	int nParam1 = (int)wParam;
+	CString strData = (LPCTSTR)lParam;  // Cast LPARAM to the data type you expect
+	TRACE("\n OnMyCustomMessage: %d %s \n", nParam1, strData);
+	CString abc;
+	abc.Format(_T("%d"), number);
+	myTxt.SetWindowText(abc);
 	return 0;
 }
 
