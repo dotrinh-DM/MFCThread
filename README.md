@@ -1,0 +1,2 @@
+# MFCThread
+Windows dev experiment
